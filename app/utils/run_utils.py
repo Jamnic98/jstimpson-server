@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from pydantic import ValidationError
 
-from app.factories.logger import logger
+from app.utils.logger import logger
 from app.core.models.run_model import RunModel
 from app.factories.database import runs_collection
 from app.utils.activity_utils import fetch_strava_activities_data

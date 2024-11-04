@@ -2,7 +2,7 @@ from datetime import datetime
 from fastapi import Query
 from fastapi.routing import APIRouter
 
-from app.factories.logger import logger
+from app.utils.logger import logger
 from app.factories.database import runs_collection
 from app.core.models.run_model import RunCollection
 

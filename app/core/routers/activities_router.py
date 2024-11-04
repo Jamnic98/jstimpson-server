@@ -4,7 +4,7 @@ from fastapi.routing import APIRouter
 
 from app.core.models.activity_model import ActivityCollection
 from app.factories.database import activities_collection
-from app.factories.logger import logger
+from app.utils.logger import logger
 
 
 router = APIRouter(

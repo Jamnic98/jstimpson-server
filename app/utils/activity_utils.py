@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from pydantic import ValidationError
 from requests import get
 
-from app.factories.logger import logger
+from app.utils.logger import logger
 from app.factories.database import strava_tokens_collection, activities_collection
 from app.core.models.activity_model import ActivityCollection
 from app.core.models.strava_token_model import StravaTokenModel

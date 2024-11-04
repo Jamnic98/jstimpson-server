@@ -9,7 +9,7 @@ from app.core.routers.runs_router import router as runs_router
 
 
 @asynccontextmanager
-async def lifespan(_app: FastAPI):
+async def __lifespan(_app: FastAPI):
     # schedule tasks
     create_scheduler().start()
     yield
@@ -18,7 +18,7 @@ async def lifespan(_app: FastAPI):
 
 
 def create_fastapi_app():
-    app = FastAPI(lifespan=lifespan)
+    app = FastAPI(lifespan=__lifespan)
 
     # add middleware
     # noinspection PyTypeChecker
