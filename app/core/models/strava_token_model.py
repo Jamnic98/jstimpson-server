@@ -4,13 +4,12 @@ from requests import post, HTTPError
 from pymongo import ReturnDocument
 from pydantic import BaseModel, BeforeValidator, Field, ValidationError
 
-from app.utils.logger import logger
 from app.factories.database import strava_tokens_collection
-from app.utils import DEFAULT_STRAVA_TOKEN_ID, STRAVA_TOKEN_API_ENDPOINT
+from app.utils.constants import DEFAULT_STRAVA_TOKEN_ID, STRAVA_TOKEN_API_ENDPOINT
+from app.utils.logger import logger
 from app.config import settings
 
 # Represents an ObjectId field in the database.
-# It will be represented as a `str` on the model so that it can be serialized to JSON.
 PyObjectId = Annotated[str, BeforeValidator(str)]
 
 

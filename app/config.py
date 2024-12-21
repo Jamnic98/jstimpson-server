@@ -20,8 +20,11 @@ class Settings(BaseSettings):
 
 settings = Settings()
 
+# db settings
 settings.DB_URI = os.getenv("DB_URI", "mongodb://localhost:27017")
 settings.DB_NAME = os.getenv("DB_NAME", "dev_database")
+
+# strava settings
 settings.STRAVA_CLIENT_ID = os.getenv("STRAVA_CLIENT_ID")
 settings.STRAVA_CLIENT_SECRET = os.getenv("STRAVA_CLIENT_SECRET")
 settings.PORT = int(os.getenv("PORT", 8080))

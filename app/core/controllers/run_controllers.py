@@ -4,7 +4,7 @@ from pydantic import ValidationError
 from app.utils.logger import logger
 from app.core.models.run_model import RunModel
 from app.factories.database import runs_collection
-from app.utils.activity_utils import fetch_strava_activities_data
+from app.core.controllers.activity_controllers import fetch_strava_activities_data
 
 
 async def add_new_runs_to_db() -> None:

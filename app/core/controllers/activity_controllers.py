@@ -3,11 +3,12 @@ from datetime import datetime, timedelta
 from pydantic import ValidationError
 from requests import get
 
-from app.utils.logger import logger
 from app.factories.database import strava_tokens_collection, activities_collection
 from app.core.models.activity_model import ActivityCollection
 from app.core.models.strava_token_model import StravaTokenModel
-from app.utils import DEFAULT_STRAVA_TOKEN_ID, STRAVA_ACTIVITIES_API_ENDPOINT
+
+from app.utils.logger import logger
+from app.utils.constants import DEFAULT_STRAVA_TOKEN_ID, STRAVA_ACTIVITIES_API_ENDPOINT
 from app.config import settings
 
 
@@ -51,7 +52,7 @@ async def add_new_activities_to_db() -> None:
     # create a query to get all activities from DB that are newer than the date in past
     query = {"start_date_local": {"$gt": date_in_past}}
     try:
-        # fetch recent activities from Strava"s API using past date
+        # fetch recent activities from Strava's API using past date
         strava_activities_data = await fetch_strava_activities_data(int(date_in_past.timestamp()))
         # fetch recent activities from DB using past date
         db_activity_data = await activities_collection.find(query).to_list(length=None)

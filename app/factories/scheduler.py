@@ -2,7 +2,7 @@ import pytz
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 
-from app.utils.run_utils import add_new_runs_to_db
+from app.core.controllers.run_controllers import add_new_runs_to_db
 
 
 def create_scheduler():
