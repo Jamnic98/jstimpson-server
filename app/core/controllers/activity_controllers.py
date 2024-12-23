@@ -8,8 +8,7 @@ from app.core.models.activity_model import ActivityCollection
 from app.core.models.strava_token_model import StravaTokenModel
 
 from app.utils.logger import logger
-from app.utils.constants import DEFAULT_STRAVA_TOKEN_ID, STRAVA_ACTIVITIES_API_ENDPOINT
-from app.config import settings
+from app.utils.constants import DEFAULT_STRAVA_TOKEN_ID, STRAVA_ACTIVITIES_API_ENDPOINT, REQUEST_TIMEOUT
 
 
 async def fetch_strava_activities_data(after: int = 0) -> ActivityCollection | None:
@@ -36,7 +35,7 @@ async def fetch_strava_activities_data(after: int = 0) -> ActivityCollection | N
             STRAVA_ACTIVITIES_API_ENDPOINT,
             headers={"Authorization": f"Bearer {strava_token.access_token}"},
             params={"after": after},
-            timeout=settings.REQUEST_TIMEOUT
+            timeout=REQUEST_TIMEOUT
         ).json()
 
     except (ValidationError, ValueError) as e:

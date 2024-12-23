@@ -6,6 +6,7 @@ from app.factories.database import mongo_client
 from app.factories.scheduler import create_scheduler
 from app.core.routers.activities_router import router as activities_router
 from app.core.routers.runs_router import router as runs_router
+from app.config import settings
 
 
 @asynccontextmanager
@@ -18,7 +19,7 @@ async def __lifespan(_app: FastAPI):
 
 
 def create_fastapi_app():
-    app = FastAPI(lifespan=__lifespan)
+    app = FastAPI(lifespan=__lifespan, debug=settings.DEBUG)
 
     # add middleware
     # noinspection PyTypeChecker

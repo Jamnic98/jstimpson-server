@@ -1,7 +1,7 @@
 from datetime import datetime
 from fastapi import Query, HTTPException
 from fastapi.routing import APIRouter
-from pymongo.errors import PyMongoError  # Import specific MongoDB exceptions
+from pymongo.errors import PyMongoError
 
 from app.utils.logger import logger
 from app.factories.database import runs_collection

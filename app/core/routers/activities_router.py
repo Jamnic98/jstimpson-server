@@ -1,6 +1,7 @@
 from datetime import datetime
 from fastapi import Query, HTTPException
 from fastapi.routing import APIRouter
+from pymongo.errors import PyMongoError
 
 from app.core.models.activity_model import ActivityCollection
 from app.factories.database import activities_collection
@@ -31,6 +32,10 @@ async def index(after: int = Query(None)):
         return ActivityCollection(
             activities=await activities_collection.find(query).to_list(length=None)
         ).model_dump()
+
+    except PyMongoError as e:
+        logger.error(f"Database error occurred: {e}")
+        raise HTTPException(status_code=500, detail="Internal Server Error: Database operation failed.")
 
     except RuntimeError:
         raise HTTPException(500, detail="Internal Server Error")
