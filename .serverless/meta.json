@@ -1,0 +1,1306 @@
+{
+  "/home/jamnic/programming/projects/jstimpson/server/serverless.yml": {
+    "versionFramework": "4.9.1",
+    "servicePath": "/home/jamnic/programming/projects/jstimpson/server/serverless.yml",
+    "serviceConfigFileName": "serverless.yml",
+    "service": {
+      "org": "jstimpson",
+      "service": "jstimpson-server",
+      "app": "jstimpson-server",
+      "provider": {
+        "name": "aws",
+        "runtime": "python3.12",
+        "profile": "personal",
+        "stage": "dev",
+        "stackName": "jstimpson-server-dev",
+        "environment": {
+          "STAGE": "dev",
+          "STRAVA_CLIENT_ID": "73217",
+          "STRAVA_CLIENT_SECRET": "<REDACTED>",
+          "DB_URI": "mongodb+srv://dbUser:Ryo28WHMYlIlSBs1@cluster0.4oko2.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
+          "DB_NAME": "dev_database"
+        },
+        "region": "us-east-1",
+        "versionFunctions": true,
+        "compiledCloudFormationTemplate": {
+          "AWSTemplateFormatVersion": "2010-09-09",
+          "Description": "The AWS CloudFormation template for this Serverless application",
+          "Resources": {
+            "DbDashupdaterLogGroup": {
+              "Type": "AWS::Logs::LogGroup",
+              "Properties": {
+                "LogGroupName": "/aws/lambda/jstimpson-server-dev-db-updater"
+              }
+            },
+            "ServerLogGroup": {
+              "Type": "AWS::Logs::LogGroup",
+              "Properties": {
+                "LogGroupName": "/aws/lambda/jstimpson-server-dev-server"
+              }
+            },
+            "IamRoleLambdaExecution": {
+              "Type": "AWS::IAM::Role",
+              "Properties": {
+                "AssumeRolePolicyDocument": {
+                  "Version": "2012-10-17",
+                  "Statement": [
+                    {
+                      "Effect": "Allow",
+                      "Principal": {
+                        "Service": [
+                          "lambda.amazonaws.com"
+                        ]
+                      },
+                      "Action": [
+                        "sts:AssumeRole"
+                      ]
+                    }
+                  ]
+                },
+                "Policies": [
+                  {
+                    "PolicyName": {
+                      "Fn::Join": [
+                        "-",
+                        [
+                          "jstimpson-server",
+                          "dev",
+                          "lambda"
+                        ]
+                      ]
+                    },
+                    "PolicyDocument": {
+                      "Version": "2012-10-17",
+                      "Statement": [
+                        {
+                          "Effect": "Allow",
+                          "Action": [
+                            "logs:CreateLogStream",
+                            "logs:CreateLogGroup",
+                            "logs:TagResource"
+                          ],
+                          "Resource": [
+                            {
+                              "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/jstimpson-server-dev*:*"
+                            }
+                          ]
+                        },
+                        {
+                          "Effect": "Allow",
+                          "Action": [
+                            "logs:PutLogEvents"
+                          ],
+                          "Resource": [
+                            {
+                              "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/jstimpson-server-dev*:*:*"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                ],
+                "Path": "/",
+                "RoleName": {
+                  "Fn::Join": [
+                    "-",
+                    [
+                      "jstimpson-server",
+                      "dev",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      "lambdaRole"
+                    ]
+                  ]
+                }
+              }
+            },
+            "DbDashupdaterLambdaFunction": {
+              "Type": "AWS::Lambda::Function",
+              "Properties": {
+                "Code": {
+                  "S3Bucket": "serverless-framework-deployments-us-east-1-ae15ec7a-acc6",
+                  "S3Key": "serverless/jstimpson-server/dev/1743028334461-2025-03-26T22:32:14.461Z/jstimpson-server.zip"
+                },
+                "Handler": "app/handlers/db_updater.handler",
+                "Runtime": "python3.12",
+                "FunctionName": "jstimpson-server-dev-db-updater",
+                "MemorySize": 1024,
+                "Timeout": 6,
+                "Environment": {
+                  "Variables": {
+                    "STAGE": "dev",
+                    "STRAVA_CLIENT_ID": "73217",
+                    "STRAVA_CLIENT_SECRET": "<REDACTED>",
+                    "DB_URI": "mongodb+srv://dbUser:Ryo28WHMYlIlSBs1@cluster0.4oko2.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
+                    "DB_NAME": "dev_database"
+                  }
+                },
+                "Role": {
+                  "Fn::GetAtt": [
+                    "IamRoleLambdaExecution",
+                    "Arn"
+                  ]
+                }
+              },
+              "DependsOn": [
+                "DbDashupdaterLogGroup"
+              ]
+            },
+            "ServerLambdaFunction": {
+              "Type": "AWS::Lambda::Function",
+              "Properties": {
+                "Code": {
+                  "S3Bucket": "serverless-framework-deployments-us-east-1-ae15ec7a-acc6",
+                  "S3Key": "serverless/jstimpson-server/dev/1743028334461-2025-03-26T22:32:14.461Z/jstimpson-server.zip"
+                },
+                "Handler": "app/handlers/server.handler",
+                "Runtime": "python3.12",
+                "FunctionName": "jstimpson-server-dev-server",
+                "MemorySize": 1024,
+                "Timeout": 6,
+                "Environment": {
+                  "Variables": {
+                    "STAGE": "dev",
+                    "STRAVA_CLIENT_ID": "73217",
+                    "STRAVA_CLIENT_SECRET": "<REDACTED>",
+                    "DB_URI": "mongodb+srv://dbUser:Ryo28WHMYlIlSBs1@cluster0.4oko2.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
+                    "DB_NAME": "dev_database"
+                  }
+                },
+                "Role": {
+                  "Fn::GetAtt": [
+                    "IamRoleLambdaExecution",
+                    "Arn"
+                  ]
+                }
+              },
+              "DependsOn": [
+                "ServerLogGroup"
+              ]
+            },
+            "DbDashupdaterLambdaVersionksQXbVcbOa8Csovrj3Wi6fVI0yzfpRfbqDyQrbKHs": {
+              "Type": "AWS::Lambda::Version",
+              "DeletionPolicy": "Retain",
+              "Properties": {
+                "FunctionName": {
+                  "Ref": "DbDashupdaterLambdaFunction"
+                },
+                "CodeSha256": "ssHPqhh8lXlfLsFeWTua8SmFou/xM/9EBFVrXaBRmhM="
+              }
+            },
+            "ServerLambdaVersion99Oz7wJEDfwN7lKtMBJB4VSRZKlMcpIHTX1eBMPas": {
+              "Type": "AWS::Lambda::Version",
+              "DeletionPolicy": "Retain",
+              "Properties": {
+                "FunctionName": {
+                  "Ref": "ServerLambdaFunction"
+                },
+                "CodeSha256": "ssHPqhh8lXlfLsFeWTua8SmFou/xM/9EBFVrXaBRmhM="
+              }
+            },
+            "HttpApi": {
+              "Type": "AWS::ApiGatewayV2::Api",
+              "Properties": {
+                "Name": "dev-jstimpson-server",
+                "ProtocolType": "HTTP"
+              }
+            },
+            "HttpApiStage": {
+              "Type": "AWS::ApiGatewayV2::Stage",
+              "Properties": {
+                "ApiId": {
+                  "Ref": "HttpApi"
+                },
+                "StageName": "$default",
+                "AutoDeploy": true,
+                "DefaultRouteSettings": {
+                  "DetailedMetricsEnabled": false
+                }
+              }
+            },
+            "ServerLambdaPermissionHttpApi": {
+              "Type": "AWS::Lambda::Permission",
+              "Properties": {
+                "FunctionName": {
+                  "Fn::GetAtt": [
+                    "ServerLambdaFunction",
+                    "Arn"
+                  ]
+                },
+                "Action": "lambda:InvokeFunction",
+                "Principal": "apigateway.amazonaws.com",
+                "SourceArn": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":execute-api:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":",
+                      {
+                        "Ref": "AWS::AccountId"
+                      },
+                      ":",
+                      {
+                        "Ref": "HttpApi"
+                      },
+                      "/*"
+                    ]
+                  ]
+                }
+              }
+            },
+            "HttpApiIntegrationServer": {
+              "Type": "AWS::ApiGatewayV2::Integration",
+              "Properties": {
+                "ApiId": {
+                  "Ref": "HttpApi"
+                },
+                "IntegrationType": "AWS_PROXY",
+                "IntegrationUri": {
+                  "Fn::GetAtt": [
+                    "ServerLambdaFunction",
+                    "Arn"
+                  ]
+                },
+                "PayloadFormatVersion": "2.0",
+                "TimeoutInMillis": 30000
+              }
+            },
+            "HttpApiRouteGetRuns": {
+              "Type": "AWS::ApiGatewayV2::Route",
+              "Properties": {
+                "ApiId": {
+                  "Ref": "HttpApi"
+                },
+                "RouteKey": "GET /runs",
+                "Target": {
+                  "Fn::Join": [
+                    "/",
+                    [
+                      "integrations",
+                      {
+                        "Ref": "HttpApiIntegrationServer"
+                      }
+                    ]
+                  ]
+                }
+              },
+              "DependsOn": "HttpApiIntegrationServer"
+            },
+            "HttpApiRouteGetActivities": {
+              "Type": "AWS::ApiGatewayV2::Route",
+              "Properties": {
+                "ApiId": {
+                  "Ref": "HttpApi"
+                },
+                "RouteKey": "GET /activities",
+                "Target": {
+                  "Fn::Join": [
+                    "/",
+                    [
+                      "integrations",
+                      {
+                        "Ref": "HttpApiIntegrationServer"
+                      }
+                    ]
+                  ]
+                }
+              },
+              "DependsOn": "HttpApiIntegrationServer"
+            },
+            "HttpApiRouteGetHealth": {
+              "Type": "AWS::ApiGatewayV2::Route",
+              "Properties": {
+                "ApiId": {
+                  "Ref": "HttpApi"
+                },
+                "RouteKey": "GET /health",
+                "Target": {
+                  "Fn::Join": [
+                    "/",
+                    [
+                      "integrations",
+                      {
+                        "Ref": "HttpApiIntegrationServer"
+                      }
+                    ]
+                  ]
+                }
+              },
+              "DependsOn": "HttpApiIntegrationServer"
+            }
+          },
+          "Outputs": {
+            "ServerlessDeploymentBucketName": {
+              "Value": "serverless-framework-deployments-us-east-1-ae15ec7a-acc6",
+              "Export": {
+                "Name": "sls-jstimpson-server-dev-ServerlessDeploymentBucketName"
+              }
+            },
+            "DbDashupdaterLambdaFunctionQualifiedArn": {
+              "Description": "Current Lambda function version",
+              "Value": {
+                "Ref": "DbDashupdaterLambdaVersionksQXbVcbOa8Csovrj3Wi6fVI0yzfpRfbqDyQrbKHs"
+              },
+              "Export": {
+                "Name": "sls-jstimpson-server-dev-DbDashupdaterLambdaFunctionQualifiedArn"
+              }
+            },
+            "ServerLambdaFunctionQualifiedArn": {
+              "Description": "Current Lambda function version",
+              "Value": {
+                "Ref": "ServerLambdaVersion99Oz7wJEDfwN7lKtMBJB4VSRZKlMcpIHTX1eBMPas"
+              },
+              "Export": {
+                "Name": "sls-jstimpson-server-dev-ServerLambdaFunctionQualifiedArn"
+              }
+            },
+            "HttpApiId": {
+              "Description": "Id of the HTTP API",
+              "Value": {
+                "Ref": "HttpApi"
+              },
+              "Export": {
+                "Name": "sls-jstimpson-server-dev-HttpApiId"
+              }
+            },
+            "HttpApiUrl": {
+              "Description": "URL of the HTTP API",
+              "Value": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "https://",
+                    {
+                      "Ref": "HttpApi"
+                    },
+                    ".execute-api.",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ".",
+                    {
+                      "Ref": "AWS::URLSuffix"
+                    }
+                  ]
+                ]
+              },
+              "Export": {
+                "Name": "sls-jstimpson-server-dev-HttpApiUrl"
+              }
+            }
+          }
+        },
+        "vpc": {}
+      },
+      "plugins": [
+        "serverless-offline",
+        "serverless-python-requirements"
+      ],
+      "functions": {
+        "db-updater": {
+          "handler": "app/handlers/db_updater.handler",
+          "memorySize": 1024,
+          "events": [],
+          "name": "jstimpson-server-dev-db-updater",
+          "package": {},
+          "memory": 1024,
+          "timeout": 6,
+          "runtime": "python3.12",
+          "vpc": {},
+          "versionLogicalId": "DbDashupdaterLambdaVersionksQXbVcbOa8Csovrj3Wi6fVI0yzfpRfbqDyQrbKHs"
+        },
+        "server": {
+          "handler": "app/handlers/server.handler",
+          "memorySize": 1024,
+          "events": [
+            {
+              "httpApi": {
+                "path": "/runs",
+                "method": "get"
+              },
+              "resolvedMethod": "GET",
+              "resolvedPath": "/runs"
+            },
+            {
+              "httpApi": {
+                "path": "/activities",
+                "method": "get"
+              },
+              "resolvedMethod": "GET",
+              "resolvedPath": "/activities"
+            },
+            {
+              "httpApi": {
+                "path": "/health",
+                "method": "get"
+              },
+              "resolvedMethod": "GET",
+              "resolvedPath": "/health"
+            }
+          ],
+          "name": "jstimpson-server-dev-server",
+          "package": {},
+          "memory": 1024,
+          "timeout": 6,
+          "runtime": "python3.12",
+          "vpc": {},
+          "versionLogicalId": "ServerLambdaVersion99Oz7wJEDfwN7lKtMBJB4VSRZKlMcpIHTX1eBMPas"
+        }
+      },
+      "custom": {
+        "pythonRequirements": {
+          "zip": true
+        },
+        "serverless-offline": {
+          "port": 3006,
+          "httpPort": 9091,
+          "lambdaPort": 3002
+        },
+        "db_name": {
+          "dev": "dev_database",
+          "test": "test_database",
+          "prod": "prod_database"
+        }
+      },
+      "package": {
+        "include": [
+          "app/**"
+        ],
+        "exclude": [
+          "node_modules/**",
+          ".git/**",
+          ".venv/**",
+          "__pycache__/**",
+          ".serverless/**",
+          ".pytest_cache/**",
+          "tests/**",
+          "venv/**",
+          ".DS_Store",
+          ".idea/**",
+          ".vscode/**"
+        ],
+        "artifactsS3KeyDirname": "serverless/jstimpson-server/dev/code-artifacts",
+        "deploymentBucket": "serverless-framework-deployments-us-east-1-ae15ec7a-acc6",
+        "patterns": [
+          "unzip_requirements.py",
+          ".requirements.zip"
+        ],
+        "artifact": "/home/jamnic/programming/projects/jstimpson/server/.serverless/jstimpson-server.zip",
+        "artifactDirectoryName": "serverless/jstimpson-server/dev/1743028334461-2025-03-26T22:32:14.461Z"
+      }
+    },
+    "provider": {
+      "name": "aws",
+      "runtime": "python3.12",
+      "profile": "personal",
+      "stage": "dev",
+      "stackName": "jstimpson-server-dev",
+      "environment": {
+        "STAGE": "dev",
+        "STRAVA_CLIENT_ID": "73217",
+        "STRAVA_CLIENT_SECRET": "<REDACTED>",
+        "DB_URI": "mongodb+srv://dbUser:Ryo28WHMYlIlSBs1@cluster0.4oko2.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
+        "DB_NAME": "dev_database"
+      },
+      "region": "us-east-1",
+      "versionFunctions": true,
+      "compiledCloudFormationTemplate": {
+        "AWSTemplateFormatVersion": "2010-09-09",
+        "Description": "The AWS CloudFormation template for this Serverless application",
+        "Resources": {
+          "DbDashupdaterLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/jstimpson-server-dev-db-updater"
+            }
+          },
+          "ServerLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/jstimpson-server-dev-server"
+            }
+          },
+          "IamRoleLambdaExecution": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+              "AssumeRolePolicyDocument": {
+                "Version": "2012-10-17",
+                "Statement": [
+                  {
+                    "Effect": "Allow",
+                    "Principal": {
+                      "Service": [
+                        "lambda.amazonaws.com"
+                      ]
+                    },
+                    "Action": [
+                      "sts:AssumeRole"
+                    ]
+                  }
+                ]
+              },
+              "Policies": [
+                {
+                  "PolicyName": {
+                    "Fn::Join": [
+                      "-",
+                      [
+                        "jstimpson-server",
+                        "dev",
+                        "lambda"
+                      ]
+                    ]
+                  },
+                  "PolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                      {
+                        "Effect": "Allow",
+                        "Action": [
+                          "logs:CreateLogStream",
+                          "logs:CreateLogGroup",
+                          "logs:TagResource"
+                        ],
+                        "Resource": [
+                          {
+                            "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/jstimpson-server-dev*:*"
+                          }
+                        ]
+                      },
+                      {
+                        "Effect": "Allow",
+                        "Action": [
+                          "logs:PutLogEvents"
+                        ],
+                        "Resource": [
+                          {
+                            "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/jstimpson-server-dev*:*:*"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              ],
+              "Path": "/",
+              "RoleName": {
+                "Fn::Join": [
+                  "-",
+                  [
+                    "jstimpson-server",
+                    "dev",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    "lambdaRole"
+                  ]
+                ]
+              }
+            }
+          },
+          "DbDashupdaterLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": "serverless-framework-deployments-us-east-1-ae15ec7a-acc6",
+                "S3Key": "serverless/jstimpson-server/dev/1743028334461-2025-03-26T22:32:14.461Z/jstimpson-server.zip"
+              },
+              "Handler": "app/handlers/db_updater.handler",
+              "Runtime": "python3.12",
+              "FunctionName": "jstimpson-server-dev-db-updater",
+              "MemorySize": 1024,
+              "Timeout": 6,
+              "Environment": {
+                "Variables": {
+                  "STAGE": "dev",
+                  "STRAVA_CLIENT_ID": "73217",
+                  "STRAVA_CLIENT_SECRET": "<REDACTED>",
+                  "DB_URI": "mongodb+srv://dbUser:Ryo28WHMYlIlSBs1@cluster0.4oko2.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
+                  "DB_NAME": "dev_database"
+                }
+              },
+              "Role": {
+                "Fn::GetAtt": [
+                  "IamRoleLambdaExecution",
+                  "Arn"
+                ]
+              }
+            },
+            "DependsOn": [
+              "DbDashupdaterLogGroup"
+            ]
+          },
+          "ServerLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": "serverless-framework-deployments-us-east-1-ae15ec7a-acc6",
+                "S3Key": "serverless/jstimpson-server/dev/1743028334461-2025-03-26T22:32:14.461Z/jstimpson-server.zip"
+              },
+              "Handler": "app/handlers/server.handler",
+              "Runtime": "python3.12",
+              "FunctionName": "jstimpson-server-dev-server",
+              "MemorySize": 1024,
+              "Timeout": 6,
+              "Environment": {
+                "Variables": {
+                  "STAGE": "dev",
+                  "STRAVA_CLIENT_ID": "73217",
+                  "STRAVA_CLIENT_SECRET": "<REDACTED>",
+                  "DB_URI": "mongodb+srv://dbUser:Ryo28WHMYlIlSBs1@cluster0.4oko2.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
+                  "DB_NAME": "dev_database"
+                }
+              },
+              "Role": {
+                "Fn::GetAtt": [
+                  "IamRoleLambdaExecution",
+                  "Arn"
+                ]
+              }
+            },
+            "DependsOn": [
+              "ServerLogGroup"
+            ]
+          },
+          "DbDashupdaterLambdaVersionksQXbVcbOa8Csovrj3Wi6fVI0yzfpRfbqDyQrbKHs": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "DbDashupdaterLambdaFunction"
+              },
+              "CodeSha256": "ssHPqhh8lXlfLsFeWTua8SmFou/xM/9EBFVrXaBRmhM="
+            }
+          },
+          "ServerLambdaVersion99Oz7wJEDfwN7lKtMBJB4VSRZKlMcpIHTX1eBMPas": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "ServerLambdaFunction"
+              },
+              "CodeSha256": "ssHPqhh8lXlfLsFeWTua8SmFou/xM/9EBFVrXaBRmhM="
+            }
+          },
+          "HttpApi": {
+            "Type": "AWS::ApiGatewayV2::Api",
+            "Properties": {
+              "Name": "dev-jstimpson-server",
+              "ProtocolType": "HTTP"
+            }
+          },
+          "HttpApiStage": {
+            "Type": "AWS::ApiGatewayV2::Stage",
+            "Properties": {
+              "ApiId": {
+                "Ref": "HttpApi"
+              },
+              "StageName": "$default",
+              "AutoDeploy": true,
+              "DefaultRouteSettings": {
+                "DetailedMetricsEnabled": false
+              }
+            }
+          },
+          "ServerLambdaPermissionHttpApi": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+              "FunctionName": {
+                "Fn::GetAtt": [
+                  "ServerLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "Action": "lambda:InvokeFunction",
+              "Principal": "apigateway.amazonaws.com",
+              "SourceArn": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":execute-api:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    ":",
+                    {
+                      "Ref": "HttpApi"
+                    },
+                    "/*"
+                  ]
+                ]
+              }
+            }
+          },
+          "HttpApiIntegrationServer": {
+            "Type": "AWS::ApiGatewayV2::Integration",
+            "Properties": {
+              "ApiId": {
+                "Ref": "HttpApi"
+              },
+              "IntegrationType": "AWS_PROXY",
+              "IntegrationUri": {
+                "Fn::GetAtt": [
+                  "ServerLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "PayloadFormatVersion": "2.0",
+              "TimeoutInMillis": 30000
+            }
+          },
+          "HttpApiRouteGetRuns": {
+            "Type": "AWS::ApiGatewayV2::Route",
+            "Properties": {
+              "ApiId": {
+                "Ref": "HttpApi"
+              },
+              "RouteKey": "GET /runs",
+              "Target": {
+                "Fn::Join": [
+                  "/",
+                  [
+                    "integrations",
+                    {
+                      "Ref": "HttpApiIntegrationServer"
+                    }
+                  ]
+                ]
+              }
+            },
+            "DependsOn": "HttpApiIntegrationServer"
+          },
+          "HttpApiRouteGetActivities": {
+            "Type": "AWS::ApiGatewayV2::Route",
+            "Properties": {
+              "ApiId": {
+                "Ref": "HttpApi"
+              },
+              "RouteKey": "GET /activities",
+              "Target": {
+                "Fn::Join": [
+                  "/",
+                  [
+                    "integrations",
+                    {
+                      "Ref": "HttpApiIntegrationServer"
+                    }
+                  ]
+                ]
+              }
+            },
+            "DependsOn": "HttpApiIntegrationServer"
+          },
+          "HttpApiRouteGetHealth": {
+            "Type": "AWS::ApiGatewayV2::Route",
+            "Properties": {
+              "ApiId": {
+                "Ref": "HttpApi"
+              },
+              "RouteKey": "GET /health",
+              "Target": {
+                "Fn::Join": [
+                  "/",
+                  [
+                    "integrations",
+                    {
+                      "Ref": "HttpApiIntegrationServer"
+                    }
+                  ]
+                ]
+              }
+            },
+            "DependsOn": "HttpApiIntegrationServer"
+          }
+        },
+        "Outputs": {
+          "ServerlessDeploymentBucketName": {
+            "Value": "serverless-framework-deployments-us-east-1-ae15ec7a-acc6",
+            "Export": {
+              "Name": "sls-jstimpson-server-dev-ServerlessDeploymentBucketName"
+            }
+          },
+          "DbDashupdaterLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "DbDashupdaterLambdaVersionksQXbVcbOa8Csovrj3Wi6fVI0yzfpRfbqDyQrbKHs"
+            },
+            "Export": {
+              "Name": "sls-jstimpson-server-dev-DbDashupdaterLambdaFunctionQualifiedArn"
+            }
+          },
+          "ServerLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "ServerLambdaVersion99Oz7wJEDfwN7lKtMBJB4VSRZKlMcpIHTX1eBMPas"
+            },
+            "Export": {
+              "Name": "sls-jstimpson-server-dev-ServerLambdaFunctionQualifiedArn"
+            }
+          },
+          "HttpApiId": {
+            "Description": "Id of the HTTP API",
+            "Value": {
+              "Ref": "HttpApi"
+            },
+            "Export": {
+              "Name": "sls-jstimpson-server-dev-HttpApiId"
+            }
+          },
+          "HttpApiUrl": {
+            "Description": "URL of the HTTP API",
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  "https://",
+                  {
+                    "Ref": "HttpApi"
+                  },
+                  ".execute-api.",
+                  {
+                    "Ref": "AWS::Region"
+                  },
+                  ".",
+                  {
+                    "Ref": "AWS::URLSuffix"
+                  }
+                ]
+              ]
+            },
+            "Export": {
+              "Name": "sls-jstimpson-server-dev-HttpApiUrl"
+            }
+          }
+        }
+      },
+      "vpc": {}
+    },
+    "dashboard": {
+      "isEnabledForService": true,
+      "requiredAuthentication": false,
+      "orgFeaturesInUse": {
+        "providers": false,
+        "monitoring": true
+      },
+      "orgObservabilityIntegrations": [
+        {
+          "integrationId": "6JQw4sj19ZPzZq98qBRqnp",
+          "awsAccountId": "343647980472",
+          "status": "alive"
+        }
+      ],
+      "serviceAppId": "3NM8yVtVPFGtBSlqYB",
+      "serviceProvider": null,
+      "instanceParameters": null
+    },
+    "serviceRawFile": "org: jstimpson\n\nservice: jstimpson-server\n\napp: jstimpson-server\n\n\nprovider:\n  name: aws\n  runtime: python3.12\n  profile: personal\n  stage: ${opt:stage, 'dev'}\n  stackName: jstimpson-server-${self:provider.stage}\n  environment:\n    STAGE: ${self:provider.stage}\n    STRAVA_CLIENT_ID: ${ssm:/jstimpson-server/STRAVA_CLIENT_ID}\n    STRAVA_CLIENT_SECRET: ${ssm:/jstimpson-server/STRAVA_CLIENT_SECRET}\n    DB_URI: ${ssm:/jstimpson-server/DB_URI}\n    DB_NAME: ${self:custom.db_name.${self:provider.stage}}\n\nplugins:\n  - serverless-offline\n  - serverless-python-requirements\n\nfunctions:\n  db-updater:\n    handler: app/handlers/db_updater.handler\n    memorySize: 1024\n  server:\n    handler: app/handlers/server.handler\n    memorySize: 1024\n    events:\n      - httpApi:\n          path: /runs\n          method: get\n      - httpApi:\n          path: /activities\n          method: get\n      - httpApi:\n          path: /health\n          method: get\n\ncustom:\n  pythonRequirements:\n    zip: true\n  serverless-offline:\n    port: 3006\n    httpPort: 9091\n    lambdaPort: 3002\n  db_name:\n    dev: ${ssm:/jstimpson-server/dev/DB_NAME}\n    test: ${ssm:/jstimpson-server/test/DB_NAME}\n    prod: ${ssm:/jstimpson-server/prod/DB_NAME}\n\npackage:\n  include:\n    - app/**\n  exclude:\n    - node_modules/**\n    - .git/**\n    - .venv/**                # Exclude Python virtual environment\n    - __pycache__/**          # Exclude Python cache files\n    - .serverless/**          # Exclude local Serverless build files\n    - .pytest_cache/**        # Exclude pytest cache\n    - tests/**                # Exclude test files (unless needed in deployment)\n    - venv/**                 # If you have another virtual environment\n    - .DS_Store               # macOS system file\n    - .idea/**                # JetBrains IDE files (PyCharm, WebStorm, etc.)\n    - .vscode/**              # VS Code settings\n",
+    "command": [
+      "package"
+    ],
+    "options": {},
+    "orgId": "cfc4dbf7-1215-4667-a6e9-93913f92765c",
+    "orgName": "jstimpson",
+    "userId": "Cx4gQFX4Pfm7KVjDsM",
+    "userName": "jstimpson",
+    "serviceProviderAwsAccountId": "343647980472",
+    "serviceProviderAwsCfStackId": null,
+    "serviceProviderAwsCfStackCreated": null,
+    "serviceProviderAwsCfStackUpdated": null,
+    "serviceProviderAwsCfStackStatus": null,
+    "serviceProviderAwsCfStackOutputs": null,
+    "compiledCloudFormationTemplate": {
+      "AWSTemplateFormatVersion": "2010-09-09",
+      "Description": "The AWS CloudFormation template for this Serverless application",
+      "Resources": {
+        "DbDashupdaterLogGroup": {
+          "Type": "AWS::Logs::LogGroup",
+          "Properties": {
+            "LogGroupName": "/aws/lambda/jstimpson-server-dev-db-updater"
+          }
+        },
+        "ServerLogGroup": {
+          "Type": "AWS::Logs::LogGroup",
+          "Properties": {
+            "LogGroupName": "/aws/lambda/jstimpson-server-dev-server"
+          }
+        },
+        "IamRoleLambdaExecution": {
+          "Type": "AWS::IAM::Role",
+          "Properties": {
+            "AssumeRolePolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Principal": {
+                    "Service": [
+                      "lambda.amazonaws.com"
+                    ]
+                  },
+                  "Action": [
+                    "sts:AssumeRole"
+                  ]
+                }
+              ]
+            },
+            "Policies": [
+              {
+                "PolicyName": {
+                  "Fn::Join": [
+                    "-",
+                    [
+                      "jstimpson-server",
+                      "dev",
+                      "lambda"
+                    ]
+                  ]
+                },
+                "PolicyDocument": {
+                  "Version": "2012-10-17",
+                  "Statement": [
+                    {
+                      "Effect": "Allow",
+                      "Action": [
+                        "logs:CreateLogStream",
+                        "logs:CreateLogGroup",
+                        "logs:TagResource"
+                      ],
+                      "Resource": [
+                        {
+                          "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/jstimpson-server-dev*:*"
+                        }
+                      ]
+                    },
+                    {
+                      "Effect": "Allow",
+                      "Action": [
+                        "logs:PutLogEvents"
+                      ],
+                      "Resource": [
+                        {
+                          "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/jstimpson-server-dev*:*:*"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ],
+            "Path": "/",
+            "RoleName": {
+              "Fn::Join": [
+                "-",
+                [
+                  "jstimpson-server",
+                  "dev",
+                  {
+                    "Ref": "AWS::Region"
+                  },
+                  "lambdaRole"
+                ]
+              ]
+            }
+          }
+        },
+        "DbDashupdaterLambdaFunction": {
+          "Type": "AWS::Lambda::Function",
+          "Properties": {
+            "Code": {
+              "S3Bucket": "serverless-framework-deployments-us-east-1-ae15ec7a-acc6",
+              "S3Key": "serverless/jstimpson-server/dev/1743028334461-2025-03-26T22:32:14.461Z/jstimpson-server.zip"
+            },
+            "Handler": "app/handlers/db_updater.handler",
+            "Runtime": "python3.12",
+            "FunctionName": "jstimpson-server-dev-db-updater",
+            "MemorySize": 1024,
+            "Timeout": 6,
+            "Environment": {
+              "Variables": {
+                "STAGE": "dev",
+                "STRAVA_CLIENT_ID": "73217",
+                "STRAVA_CLIENT_SECRET": "<REDACTED>",
+                "DB_URI": "mongodb+srv://dbUser:Ryo28WHMYlIlSBs1@cluster0.4oko2.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
+                "DB_NAME": "dev_database"
+              }
+            },
+            "Role": {
+              "Fn::GetAtt": [
+                "IamRoleLambdaExecution",
+                "Arn"
+              ]
+            }
+          },
+          "DependsOn": [
+            "DbDashupdaterLogGroup"
+          ]
+        },
+        "ServerLambdaFunction": {
+          "Type": "AWS::Lambda::Function",
+          "Properties": {
+            "Code": {
+              "S3Bucket": "serverless-framework-deployments-us-east-1-ae15ec7a-acc6",
+              "S3Key": "serverless/jstimpson-server/dev/1743028334461-2025-03-26T22:32:14.461Z/jstimpson-server.zip"
+            },
+            "Handler": "app/handlers/server.handler",
+            "Runtime": "python3.12",
+            "FunctionName": "jstimpson-server-dev-server",
+            "MemorySize": 1024,
+            "Timeout": 6,
+            "Environment": {
+              "Variables": {
+                "STAGE": "dev",
+                "STRAVA_CLIENT_ID": "73217",
+                "STRAVA_CLIENT_SECRET": "<REDACTED>",
+                "DB_URI": "mongodb+srv://dbUser:Ryo28WHMYlIlSBs1@cluster0.4oko2.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
+                "DB_NAME": "dev_database"
+              }
+            },
+            "Role": {
+              "Fn::GetAtt": [
+                "IamRoleLambdaExecution",
+                "Arn"
+              ]
+            }
+          },
+          "DependsOn": [
+            "ServerLogGroup"
+          ]
+        },
+        "DbDashupdaterLambdaVersionksQXbVcbOa8Csovrj3Wi6fVI0yzfpRfbqDyQrbKHs": {
+          "Type": "AWS::Lambda::Version",
+          "DeletionPolicy": "Retain",
+          "Properties": {
+            "FunctionName": {
+              "Ref": "DbDashupdaterLambdaFunction"
+            },
+            "CodeSha256": "ssHPqhh8lXlfLsFeWTua8SmFou/xM/9EBFVrXaBRmhM="
+          }
+        },
+        "ServerLambdaVersion99Oz7wJEDfwN7lKtMBJB4VSRZKlMcpIHTX1eBMPas": {
+          "Type": "AWS::Lambda::Version",
+          "DeletionPolicy": "Retain",
+          "Properties": {
+            "FunctionName": {
+              "Ref": "ServerLambdaFunction"
+            },
+            "CodeSha256": "ssHPqhh8lXlfLsFeWTua8SmFou/xM/9EBFVrXaBRmhM="
+          }
+        },
+        "HttpApi": {
+          "Type": "AWS::ApiGatewayV2::Api",
+          "Properties": {
+            "Name": "dev-jstimpson-server",
+            "ProtocolType": "HTTP"
+          }
+        },
+        "HttpApiStage": {
+          "Type": "AWS::ApiGatewayV2::Stage",
+          "Properties": {
+            "ApiId": {
+              "Ref": "HttpApi"
+            },
+            "StageName": "$default",
+            "AutoDeploy": true,
+            "DefaultRouteSettings": {
+              "DetailedMetricsEnabled": false
+            }
+          }
+        },
+        "ServerLambdaPermissionHttpApi": {
+          "Type": "AWS::Lambda::Permission",
+          "Properties": {
+            "FunctionName": {
+              "Fn::GetAtt": [
+                "ServerLambdaFunction",
+                "Arn"
+              ]
+            },
+            "Action": "lambda:InvokeFunction",
+            "Principal": "apigateway.amazonaws.com",
+            "SourceArn": {
+              "Fn::Join": [
+                "",
+                [
+                  "arn:",
+                  {
+                    "Ref": "AWS::Partition"
+                  },
+                  ":execute-api:",
+                  {
+                    "Ref": "AWS::Region"
+                  },
+                  ":",
+                  {
+                    "Ref": "AWS::AccountId"
+                  },
+                  ":",
+                  {
+                    "Ref": "HttpApi"
+                  },
+                  "/*"
+                ]
+              ]
+            }
+          }
+        },
+        "HttpApiIntegrationServer": {
+          "Type": "AWS::ApiGatewayV2::Integration",
+          "Properties": {
+            "ApiId": {
+              "Ref": "HttpApi"
+            },
+            "IntegrationType": "AWS_PROXY",
+            "IntegrationUri": {
+              "Fn::GetAtt": [
+                "ServerLambdaFunction",
+                "Arn"
+              ]
+            },
+            "PayloadFormatVersion": "2.0",
+            "TimeoutInMillis": 30000
+          }
+        },
+        "HttpApiRouteGetRuns": {
+          "Type": "AWS::ApiGatewayV2::Route",
+          "Properties": {
+            "ApiId": {
+              "Ref": "HttpApi"
+            },
+            "RouteKey": "GET /runs",
+            "Target": {
+              "Fn::Join": [
+                "/",
+                [
+                  "integrations",
+                  {
+                    "Ref": "HttpApiIntegrationServer"
+                  }
+                ]
+              ]
+            }
+          },
+          "DependsOn": "HttpApiIntegrationServer"
+        },
+        "HttpApiRouteGetActivities": {
+          "Type": "AWS::ApiGatewayV2::Route",
+          "Properties": {
+            "ApiId": {
+              "Ref": "HttpApi"
+            },
+            "RouteKey": "GET /activities",
+            "Target": {
+              "Fn::Join": [
+                "/",
+                [
+                  "integrations",
+                  {
+                    "Ref": "HttpApiIntegrationServer"
+                  }
+                ]
+              ]
+            }
+          },
+          "DependsOn": "HttpApiIntegrationServer"
+        },
+        "HttpApiRouteGetHealth": {
+          "Type": "AWS::ApiGatewayV2::Route",
+          "Properties": {
+            "ApiId": {
+              "Ref": "HttpApi"
+            },
+            "RouteKey": "GET /health",
+            "Target": {
+              "Fn::Join": [
+                "/",
+                [
+                  "integrations",
+                  {
+                    "Ref": "HttpApiIntegrationServer"
+                  }
+                ]
+              ]
+            }
+          },
+          "DependsOn": "HttpApiIntegrationServer"
+        }
+      },
+      "Outputs": {
+        "ServerlessDeploymentBucketName": {
+          "Value": "serverless-framework-deployments-us-east-1-ae15ec7a-acc6",
+          "Export": {
+            "Name": "sls-jstimpson-server-dev-ServerlessDeploymentBucketName"
+          }
+        },
+        "DbDashupdaterLambdaFunctionQualifiedArn": {
+          "Description": "Current Lambda function version",
+          "Value": {
+            "Ref": "DbDashupdaterLambdaVersionksQXbVcbOa8Csovrj3Wi6fVI0yzfpRfbqDyQrbKHs"
+          },
+          "Export": {
+            "Name": "sls-jstimpson-server-dev-DbDashupdaterLambdaFunctionQualifiedArn"
+          }
+        },
+        "ServerLambdaFunctionQualifiedArn": {
+          "Description": "Current Lambda function version",
+          "Value": {
+            "Ref": "ServerLambdaVersion99Oz7wJEDfwN7lKtMBJB4VSRZKlMcpIHTX1eBMPas"
+          },
+          "Export": {
+            "Name": "sls-jstimpson-server-dev-ServerLambdaFunctionQualifiedArn"
+          }
+        },
+        "HttpApiId": {
+          "Description": "Id of the HTTP API",
+          "Value": {
+            "Ref": "HttpApi"
+          },
+          "Export": {
+            "Name": "sls-jstimpson-server-dev-HttpApiId"
+          }
+        },
+        "HttpApiUrl": {
+          "Description": "URL of the HTTP API",
+          "Value": {
+            "Fn::Join": [
+              "",
+              [
+                "https://",
+                {
+                  "Ref": "HttpApi"
+                },
+                ".execute-api.",
+                {
+                  "Ref": "AWS::Region"
+                },
+                ".",
+                {
+                  "Ref": "AWS::URLSuffix"
+                }
+              ]
+            ]
+          },
+          "Export": {
+            "Name": "sls-jstimpson-server-dev-HttpApiUrl"
+          }
+        }
+      }
+    }
+  }
+}
