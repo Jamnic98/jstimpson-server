@@ -1,0 +1,72 @@
+org: jstimpson
+
+service: jstimpson-server
+
+app: jstimpson-server
+
+
+provider:
+  name: aws
+  runtime: python3.12
+  profile: personal
+  stage: ${opt:stage, 'dev'}
+  stackName: jstimpson-server-${self:provider.stage}
+  environment:
+    STAGE: ${self:provider.stage}
+    STRAVA_CLIENT_ID: ${ssm:/jstimpson-server/STRAVA_CLIENT_ID}
+    STRAVA_CLIENT_SECRET: ${ssm:/jstimpson-server/STRAVA_CLIENT_SECRET}
+    DB_URI: ${ssm:/jstimpson-server/DB_URI}
+    DB_NAME: ${self:custom.db_name.${self:provider.stage}}
+
+plugins:
+  - serverless-offline
+  - serverless-python-requirements
+
+functions:
+  db-updater:
+    name: jstimpson-server-db-updater-${self:provider.stage}
+    handler: app/handlers/db_updater.handler
+    memorySize: 1024
+  api:
+    name: jstimpson-server-api-${self:provider.stage}
+    handler: app/handlers/api.handler
+    memorySize: 1024
+    events:
+      - httpApi:
+          path: /runs
+          method: get
+      - httpApi:
+          path: /activities
+          method: get
+      - httpApi:
+          path: /health
+          method: get
+
+custom:
+  pythonRequirements:
+    dockerizePip: true
+    zip: true
+  serverless-offline:
+    port: 3006
+    httpPort: 9091
+    lambdaPort: 3002
+  db_name:
+    dev: ${ssm:/jstimpson-server/dev/DB_NAME}
+    test: ${ssm:/jstimpson-server/test/DB_NAME}
+    prod: ${ssm:/jstimpson-server/prod/DB_NAME}
+
+package:
+  include:
+    - app/**
+  exclude:
+    - node_modules/**
+    - .git/**
+    - .venv/**                # Exclude Python virtual environment
+    - __pycache__/**          # Exclude Python cache files
+    - .serverless/**          # Exclude local Serverless build files
+    - .pytest_cache/**        # Exclude pytest cache
+    - tests/**                # Exclude test files (unless needed in deployment)
+    - venv/**                 # If you have another virtual environment
+    - .DS_Store               # macOS system file
+    - .idea/**                # JetBrains IDE files (PyCharm, WebStorm, etc.)
+    - .vscode/**              # VS Code settings

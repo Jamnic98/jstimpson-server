@@ -1,17 +1,24 @@
-.idea/
-.venv/
-
-*.pyc
-__pycache__/
-
-.pytest_cache/
-.coverage
-htmlcov/
-
-dist/
+# Distribution / packaging
+.Python
+.env
+env/
 build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
 *.egg-info/
+.installed.cfg
+*.egg
+.idea
 
-.env.dev
-.env.test
-.env.prod
+# Serverless directories
+.serverless
+
+node_modules/

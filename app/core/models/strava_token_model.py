@@ -7,7 +7,7 @@ from pydantic import BaseModel, BeforeValidator, Field, ValidationError
 from app.factories.database import strava_tokens_collection
 from app.utils.constants import DEFAULT_STRAVA_TOKEN_ID, STRAVA_TOKEN_API_ENDPOINT, REQUEST_TIMEOUT
 from app.utils.logger import logger
-from app.config import settings
+from app.utils.config import settings
 
 # Represents an ObjectId field in the database.
 PyObjectId = Annotated[str, BeforeValidator(str)]
@@ -21,7 +21,7 @@ class StravaTokenModel(BaseModel):
     expires_in: int
 
     @classmethod
-    async def __fetch_new_strava_token_data(cls, refresh_token: str) -> dict | None:
+    async def fetch_new_strava_token_data(cls, refresh_token: str) -> dict | None:
         """
             Fetches new token from Strava API
 
@@ -55,7 +55,7 @@ class StravaTokenModel(BaseModel):
     async def refresh(self) -> None:
         logger.info("Attempting to refresh Strava token")
         try:
-            new_token_data = await self.__class__.__fetch_new_strava_token_data(self.refresh_token)
+            new_token_data = await self.__class__.fetch_new_strava_token_data(self.refresh_token)
             if not new_token_data:
                 raise ValueError("Unable to refresh Strava token without new token data")
             # update database token

@@ -21,11 +21,11 @@ async def index(after: int = Query(None)):
     Returns:
         RunCollection: A collection of runs.
     """
+    logger.info("Fetching runs from database")
     if after is not None and after < 0:
         raise HTTPException(status_code=400, detail="Invalid timestamp: must be a positive integer.")
 
     try:
-        logger.info("Fetching runs from database")
         query = {}
         if after:
             # Convert timestamp from Unix time (milliseconds)
@@ -36,9 +36,9 @@ async def index(after: int = Query(None)):
         return RunCollection(runs=runs).model_dump()
 
     except PyMongoError as e:
-        logger.error(f"Database error occurred: {e}")
-        raise HTTPException(status_code=500, detail="Internal Server Error: Database operation failed.")
+        logger.error("Database error occurred: %s", e)
+        raise HTTPException(status_code=500, detail="Internal Server Error: Database operation failed.") from e
 
-    except Exception as e:
-        logger.error(f"Unexpected error occurred: {e}")
-        raise HTTPException(status_code=500, detail="Internal Server Error: An unexpected error occurred.")
+    except (RuntimeError, Exception) as e:
+        logger.error("Unexpected error occurred: %s", e)
+        raise HTTPException(status_code=500, detail="Internal Server Error: An unexpected error occurred.") from e

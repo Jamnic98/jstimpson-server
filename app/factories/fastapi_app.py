@@ -3,16 +3,14 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.factories.database import mongo_client
-from app.factories.scheduler import create_scheduler
 from app.core.routers.activities_router import router as activities_router
 from app.core.routers.runs_router import router as runs_router
-from app.config import settings
+from app.utils.config import settings
 
 
 @asynccontextmanager
 async def __lifespan(_app: FastAPI):
     # schedule tasks
-    create_scheduler().start()
     yield
     # close connections
     mongo_client.close()

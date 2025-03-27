@@ -14,15 +14,18 @@ router = APIRouter(
 
 @router.get("", response_model=ActivityCollection)
 async def index(after: int = Query(None)):
+    """
+    Fetch activities from database
+
+    Parameters:
+        after (int): unix time stamp to filter activities after a certain date
+
+    """
+    logger.info("Fetching activities from database")
+    if after is not None and after < 0:
+        raise HTTPException(status_code=400, detail="Invalid timestamp: must be a positive integer.")
+
     try:
-        """
-        Fetch activities from database
-
-        Parameters:
-            after (int): unix time stamp to filter activities after a certain date
-
-        """
-        logger.info("Fetching activities from database")
         query = {}
         if after:
             # convert timestamp from unix time
@@ -34,8 +37,9 @@ async def index(after: int = Query(None)):
         ).model_dump()
 
     except PyMongoError as e:
-        logger.error(f"Database error occurred: {e}")
-        raise HTTPException(status_code=500, detail="Internal Server Error: Database operation failed.")
+        logger.error("Database error occurred: %s", e)
+        raise HTTPException(status_code=500, detail="Internal Server Error: Database operation failed.") from e
 
-    except RuntimeError:
-        raise HTTPException(500, detail="Internal Server Error")
+    except (RuntimeError, Exception) as e:
+        logger.error("Unexpected error occurred: %s", e)
+        raise HTTPException(500, detail="Internal Server Error") from e
