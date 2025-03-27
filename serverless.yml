@@ -24,10 +24,12 @@ plugins:
 
 functions:
   db-updater:
+    name: jstimpson-server-db-updater-${self:provider.stage}
     handler: app/handlers/db_updater.handler
     memorySize: 1024
-  server:
-    handler: app/handlers/server.handler
+  api:
+    name: jstimpson-server-api-${self:provider.stage}
+    handler: app/handlers/api.handler
     memorySize: 1024
     events:
       - httpApi:
@@ -42,6 +44,7 @@ functions:
 
 custom:
   pythonRequirements:
+    dockerizePip: true
     zip: true
   serverless-offline:
     port: 3006
