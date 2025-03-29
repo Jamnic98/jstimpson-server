@@ -23,8 +23,7 @@ async def fetch_strava_activities_data(after: int = 0) -> ActivityCollection | N
         # fetch token from db
         token_data = await strava_tokens_collection.find_one({"_id": DEFAULT_STRAVA_TOKEN_ID})
         if not token_data:
-            raise (
-                ValueError(f"Failed to find a token with id: {DEFAULT_STRAVA_TOKEN_ID}"))
+            raise ValueError(f"Failed to find a token with id: {DEFAULT_STRAVA_TOKEN_ID}")
 
         strava_token = StravaTokenModel(**token_data)
         if not strava_token.is_token_valid():

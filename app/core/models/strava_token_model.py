@@ -9,6 +9,7 @@ from app.utils.constants import DEFAULT_STRAVA_TOKEN_ID, STRAVA_TOKEN_API_ENDPOI
 from app.utils.logger import logger
 from app.utils.config import settings
 
+
 # Represents an ObjectId field in the database.
 PyObjectId = Annotated[str, BeforeValidator(str)]
 

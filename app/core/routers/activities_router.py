@@ -3,9 +3,10 @@ from fastapi import Query, HTTPException
 from fastapi.routing import APIRouter
 from pymongo.errors import PyMongoError
 
+from app.utils.logger import logger
 from app.core.models.activity_model import ActivityCollection
 from app.factories.database import activities_collection
-from app.utils.logger import logger
+
 
 router = APIRouter(
     prefix="/activities"

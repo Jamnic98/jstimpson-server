@@ -7,6 +7,7 @@ from app.utils.logger import logger
 from app.factories.database import runs_collection
 from app.core.models.run_model import RunCollection
 
+
 router = APIRouter(prefix="/runs")
 
 

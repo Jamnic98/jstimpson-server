@@ -4,6 +4,7 @@ from pydantic import BaseModel, BeforeValidator, Field
 
 from app.utils.enums import SportType
 
+
 # Represents an ObjectId field in the database.
 PyObjectId = Annotated[str, BeforeValidator(str)]
 

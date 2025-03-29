@@ -3,6 +3,7 @@ from typing import Annotated, Optional
 
 from pydantic import BaseModel, BeforeValidator, Field
 
+
 # Represents an ObjectId field in the database.
 PyObjectId = Annotated[str, BeforeValidator(str)]
 

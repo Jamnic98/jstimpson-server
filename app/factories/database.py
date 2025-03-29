@@ -1,10 +1,13 @@
 from motor.motor_asyncio import AsyncIOMotorClient
 
+from app.utils.logger import logger
 from app.utils.config import settings
 
 
 # Attempt to create a MongoDB client
+logger.info("Connecting to MongoDB...")
 mongo_client = AsyncIOMotorClient(settings.DB_URI)
+logger.info("Database connection established")
 
 # Attempt to get the database
 db = mongo_client.get_database(settings.DB_NAME)

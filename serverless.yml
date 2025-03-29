@@ -8,13 +8,15 @@ app: jstimpson-server
 provider:
   name: aws
   runtime: python3.12
-  profile: personal
   stage: ${opt:stage, 'dev'}
   stackName: jstimpson-server-${self:provider.stage}
   environment:
     STAGE: ${self:provider.stage}
     STRAVA_CLIENT_ID: ${ssm:/jstimpson-server/STRAVA_CLIENT_ID}
     STRAVA_CLIENT_SECRET: ${ssm:/jstimpson-server/STRAVA_CLIENT_SECRET}
+    MONGO_PUBLIC_KEY: ${ssm:/jstimpson-server/MONGO_PUBLIC_KEY}
+    MONGO_PRIVATE_KEY: ${ssm:/jstimpson-server/MONGO_PUBLIC_KEY}
+    DB_PROJECT_ID: ${ssm:/jstimpson-server/DB_PROJECT_ID}
     DB_URI: ${ssm:/jstimpson-server/DB_URI}
     DB_NAME: ${self:custom.db_name.${self:provider.stage}}
 
@@ -25,12 +27,16 @@ plugins:
 functions:
   db-updater:
     name: jstimpson-server-db-updater-${self:provider.stage}
-    handler: app/handlers/db_updater.handler
+    handler: app.handlers.db_updater.handler
     memorySize: 1024
+    layers:
+      - { Ref: PythonRequirementsLambdaLayer }
   api:
     name: jstimpson-server-api-${self:provider.stage}
-    handler: app/handlers/api.handler
+    handler: app.handlers.api.handler
     memorySize: 1024
+    layers:
+      - { Ref: PythonRequirementsLambdaLayer }
     events:
       - httpApi:
           path: /runs
@@ -44,7 +50,8 @@ functions:
 
 custom:
   pythonRequirements:
-    dockerizePip: true
+    dockerizePip: non-linux
+    layer: true
     zip: true
   serverless-offline:
     port: 3006
@@ -58,15 +65,3 @@ custom:
 package:
   include:
     - app/**
-  exclude:
-    - node_modules/**
-    - .git/**
-    - .venv/**                # Exclude Python virtual environment
-    - __pycache__/**          # Exclude Python cache files
-    - .serverless/**          # Exclude local Serverless build files
-    - .pytest_cache/**        # Exclude pytest cache
-    - tests/**                # Exclude test files (unless needed in deployment)
-    - venv/**                 # If you have another virtual environment
-    - .DS_Store               # macOS system file
-    - .idea/**                # JetBrains IDE files (PyCharm, WebStorm, etc.)
-    - .vscode/**              # VS Code settings

@@ -4,7 +4,7 @@
     "deploy": "sls deploy -s dev"
   },
   "devDependencies": {
-    "@types/node": "^22.13.1",
+    "@types/node": "^22.13.14",
     "serverless": "^4.9.1",
     "serverless-deployment-bucket": "^1.6.0",
     "serverless-offline": "^14.4.0",
