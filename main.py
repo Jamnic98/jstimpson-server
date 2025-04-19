@@ -9,4 +9,4 @@ app = create_fastapi_app()
 logger.info("FastAPI app created.")
 
 PORT = os.getenv('PORT', 8080)
-uvicorn.run(app, host="0.0.0.0", port=PORT, log_level="debug")
+uvicorn.run(app, host="127.0.0.1", port=PORT, log_level="debug")

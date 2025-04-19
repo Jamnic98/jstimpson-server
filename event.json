@@ -1,7 +1,0 @@
-{
-    "httpMethod": "GET",
-    "path": "/health",
-    "headers": {},
-    "queryStringParameters": {},
-    "body": null
-}
