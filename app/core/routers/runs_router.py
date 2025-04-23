@@ -1,3 +1,4 @@
+from http import HTTPStatus
 from datetime import datetime
 from fastapi import Query, HTTPException
 from fastapi.routing import APIRouter
@@ -24,7 +25,7 @@ async def index(after: int = Query(None)):
     """
     logger.info("Fetching runs from database")
     if after is not None and after < 0:
-        raise HTTPException(status_code=400, detail="Invalid timestamp: must be a positive integer.")
+        raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail="Invalid timestamp: must be a positive integer")
 
     try:
         query = {}
@@ -33,13 +34,18 @@ async def index(after: int = Query(None)):
             query = {"start_date_local": {"$gt": datetime.fromtimestamp(after / 1000)}}
 
         # Fetch and return the list of runs
-        runs = await runs_collection.find(query).to_list(length=None)
-        return RunCollection(runs=runs).model_dump()
+        return RunCollection(
+            runs=await runs_collection.find(query).to_list(length=None)
+        ).model_dump()
 
     except PyMongoError as e:
         logger.error("Database error occurred: %s", e)
-        raise HTTPException(status_code=500, detail="Internal Server Error: Database operation failed.") from e
+        raise HTTPException(
+            status_code=HTTPStatus.SERVICE_UNAVAILABLE, detail="Internal Server Error: Database operation failed"
+        ) from e
 
     except (RuntimeError, Exception) as e:
         logger.error("Unexpected error occurred: %s", e)
-        raise HTTPException(status_code=500, detail="Internal Server Error: An unexpected error occurred.") from e
+        raise HTTPException(
+            status_code=HTTPStatus.SERVICE_UNAVAILABLE, detail="Internal Server Error: An unexpected error occurred"
+        ) from e

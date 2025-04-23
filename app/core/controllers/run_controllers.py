@@ -1,17 +1,18 @@
 from datetime import datetime, timedelta
+from typing import List, Optional
+
 from pydantic import ValidationError
 
-from app.utils.logger import logger
-from app.core.models.run_model import RunModel
-from app.factories.database import runs_collection
 from app.core.controllers.activity_controllers import fetch_strava_activities_data
+from app.core.models.run_model import RunModel
+from app.utils.logger import logger
 
 
-async def add_new_runs_to_db() -> None:
+async def add_new_runs_to_db(runs_collection) -> Optional[List]:
     logger.info("Attempting to add new runs to DB")
-    # get a date from a week ago
+    # get a date from a weeks ago
     current_date = datetime.now()
-    date_in_past = current_date - timedelta(days=14)
+    date_in_past = current_date - timedelta(days=7)
     # create a query to get all runs from DB that are newer than the date in past
     query = {"start_date_local": {"$gt": date_in_past}}
     try:
@@ -35,16 +36,20 @@ async def add_new_runs_to_db() -> None:
             # upload new runs to DB
             run_data = []
             for strava_run in filtered_strava_runs:
-                run_data.append(RunModel.model_validate({
-                        "distance": strava_run["distance"],
-                        "duration": strava_run["moving_time"],
-                        "start_date_local": strava_run["start_date_local"],
-                    }).model_dump()
-                )
+                # Prepare data for insertion
+                run = RunModel.model_validate({
+                    "distance": strava_run["distance"],
+                    "duration": strava_run["moving_time"],
+                    "start_date_local": strava_run["start_date_local"],
+                })
+                run_data.append(run.model_dump())
+
             await runs_collection.insert_many(run_data)
             logger.info("Successfully inserted new runs to DB: %s", run_data)
-        else:
-            logger.info("No new runs to upload")
+            return run_data
 
-    except (TypeError, ValidationError, ValueError) as e:
+        logger.info("No new data to upload")
+        return None
+
+    except (RuntimeError, TypeError, ValidationError, ValueError) as e:
         logger.error("Failed to add new runs to DB: %s", e)

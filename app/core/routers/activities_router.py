@@ -1,3 +1,4 @@
+from http import HTTPStatus
 from datetime import datetime
 from fastapi import Query, HTTPException
 from fastapi.routing import APIRouter
@@ -8,9 +9,7 @@ from app.core.models.activity_model import ActivityCollection
 from app.factories.database import activities_collection
 
 
-router = APIRouter(
-    prefix="/activities"
-)
+router = APIRouter(prefix="/activities")
 
 
 @router.get("", response_model=ActivityCollection)
@@ -21,10 +20,12 @@ async def index(after: int = Query(None)):
     Parameters:
         after (int): unix time stamp to filter activities after a certain date
 
+    Returns:
+    ActivityCollection: A collection of activities.
     """
     logger.info("Fetching activities from database")
     if after is not None and after < 0:
-        raise HTTPException(status_code=400, detail="Invalid timestamp: must be a positive integer.")
+        raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail="Invalid timestamp: must be a positive integer")
 
     try:
         query = {}
@@ -39,8 +40,12 @@ async def index(after: int = Query(None)):
 
     except PyMongoError as e:
         logger.error("Database error occurred: %s", e)
-        raise HTTPException(status_code=500, detail="Internal Server Error: Database operation failed.") from e
+        raise HTTPException(
+            status_code=HTTPStatus.SERVICE_UNAVAILABLE, detail="Internal Server Error: Database operation failed"
+        ) from e
 
     except (RuntimeError, Exception) as e:
         logger.error("Unexpected error occurred: %s", e)
-        raise HTTPException(500, detail="Internal Server Error") from e
+        raise HTTPException(
+            status_code=HTTPStatus.SERVICE_UNAVAILABLE, detail="Internal Server Error: An unexpected error occurred"
+        ) from e
