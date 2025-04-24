@@ -1,15 +1,13 @@
-from datetime import datetime, timedelta
 from typing import List
-
+from datetime import datetime, timedelta
 from pydantic import ValidationError
 from requests import get
 
-from app.factories.database import strava_tokens_collection, activities_collection
 from app.core.models.activity_model import ActivityCollection, ActivityModel
 from app.core.models.strava_token_model import StravaTokenModel
-
-from app.utils.logger import logger
+from app.factories.database import strava_tokens_collection, activities_collection
 from app.utils.constants import DEFAULT_STRAVA_TOKEN_ID, STRAVA_ACTIVITIES_API_ENDPOINT, REQUEST_TIMEOUT
+from app.utils.logger import logger
 
 
 async def fetch_strava_activities_data(after: int = 0) -> List[ActivityModel]:
@@ -24,9 +22,9 @@ async def fetch_strava_activities_data(after: int = 0) -> List[ActivityModel]:
         # fetch token from db
         token_data = await strava_tokens_collection.find_one({"_id": DEFAULT_STRAVA_TOKEN_ID})
         if not token_data:
-            raise ValueError(f"Failed to find a token with id: {DEFAULT_STRAVA_TOKEN_ID}")
+            raise ValueError(f"No token with id = {DEFAULT_STRAVA_TOKEN_ID}")
 
-        strava_token = StravaTokenModel(**token_data)
+        strava_token = StravaTokenModel.model_validate(token_data)
         if not strava_token.is_token_valid():
             await strava_token.refresh()
 
@@ -41,9 +39,13 @@ async def fetch_strava_activities_data(after: int = 0) -> List[ActivityModel]:
         logger.info("Fetched %d activities", len(strava_activities))
         return strava_activities
 
-    except (ValidationError, ValueError) as e:
-        logger.error("Failed to fetch Strava activities: %s", e)
-        return []
+    except ValidationError as e:
+        logger.error("Token data failed validation: %s", e)
+        raise RuntimeError("Invalid token data format") from e
+
+    except ValueError as e:
+        logger.error("Token error: %s", e)
+        raise RuntimeError("Missing or invalid Strava token") from e
 
 
 async def add_new_activities_to_db() -> List[ActivityModel]:
@@ -88,11 +90,11 @@ async def add_new_activities_to_db() -> List[ActivityModel]:
             activities = ActivityCollection.model_validate(activity_data)
             await activities_collection.insert_many(activities)
             logger.info("Successfully inserted new activities to DB: %s", activities)
-            return activity_data
+            return activities.model_dump()
 
         logger.info("No new data to upload")
         return []
 
     except (TypeError, ValidationError, ValueError) as e:
         logger.error("Failed to insert new activities to DB: %s", e)
-        return []
+        raise RuntimeError from e

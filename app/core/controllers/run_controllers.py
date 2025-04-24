@@ -4,7 +4,7 @@ from pydantic import ValidationError
 
 from app.core.controllers.activity_controllers import fetch_strava_activities_data
 from app.core.models.run_model import RunCollection, RunModel
-
+from app.utils.errors import StravaTokenError
 from app.utils.logger import logger
 
 
@@ -55,6 +55,6 @@ async def add_new_runs_to_db(runs_collection) -> List[RunModel]:
         logger.info("No new data to upload")
         return []
 
-    except (RuntimeError, TypeError, ValidationError, ValueError) as e:
-        logger.error("Failed to add new runs to DB: %s", e)
-        return []
+    except (RuntimeError, StravaTokenError, TypeError, ValidationError, ValueError) as e:
+        logger.error("Failed to insert new runs to DB: %s", e)
+        raise RuntimeError from e

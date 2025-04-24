@@ -1,0 +1,2 @@
+class StravaTokenError(Exception):
+    pass

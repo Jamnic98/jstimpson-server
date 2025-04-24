@@ -1,7 +1,7 @@
 from motor.motor_asyncio import AsyncIOMotorClient
 
-from app.utils.logger import logger
 from app.utils.config import settings
+from app.utils.logger import logger
 
 
 # Attempt to create a MongoDB client

@@ -9,13 +9,13 @@ provider:
   name: aws
   region: us-east-1
   runtime: python3.12
-  stage: ${opt:stage, 'dev'}
+  stage: ${opt:stage, 'local'}
   stackName: jstimpson-server-${self:provider.stage}
   environment:
     ENV: ${self:provider.stage}
     STRAVA_CLIENT_ID: ${ssm:/jstimpson-server/STRAVA_CLIENT_ID}
     STRAVA_CLIENT_SECRET: ${ssm:/jstimpson-server/STRAVA_CLIENT_SECRET}
-    DB_NAME: ${self:custom.db_name.${self:provider.stage}}
+    DB_NAME: ${ssm:/jstimpson-server/${self:provider.stage}/DB_NAME}
     DB_URI: ${ssm:/jstimpson-server/DB_URI}
   iamRoleStatements:
     - Effect: "Allow"
@@ -27,7 +27,6 @@ provider:
 plugins:
   - serverless-offline
   - serverless-python-requirements
-  - serverless-dotenv-plugin
 
 functions:
   db-updater:
@@ -65,10 +64,6 @@ custom:
     port: 3006
     httpPort: 9091
     lambdaPort: 3002
-  db_name:
-    dev: ${ssm:/jstimpson-server/dev/DB_NAME}
-    test: ${ssm:/jstimpson-server/test/DB_NAME}
-    prod: ${ssm:/jstimpson-server/prod/DB_NAME}
 
 package:
   include:
