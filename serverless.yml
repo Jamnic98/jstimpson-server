@@ -16,7 +16,8 @@ provider:
     STRAVA_CLIENT_ID: ${ssm:/jstimpson-server/STRAVA_CLIENT_ID}
     STRAVA_CLIENT_SECRET: ${ssm:/jstimpson-server/STRAVA_CLIENT_SECRET}
     DB_NAME: ${ssm:/jstimpson-server/${self:provider.stage}/DB_NAME}
-    DB_URI: ${ssm:/jstimpson-server/DB_URI}
+    DB_URI: ${self:custom.dbUri.${self:provider.stage}}
+
   iamRoleStatements:
     - Effect: "Allow"
       Action:
@@ -56,6 +57,10 @@ functions:
           method: get
 
 custom:
+  dbUri:
+    local: "mongodb://localhost:27017"
+    dev: ${ssm:/jstimpson-server/DB_URI}
+    prod: ${ssm:/jstimpson-server/DB_URI}
   pythonRequirements:
     dockerizePip: non-linux
     layer: true
