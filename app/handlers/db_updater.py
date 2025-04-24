@@ -20,7 +20,7 @@ def handler(_event, _context):
             "body": f"Successfully uploaded {len(response)} runs"
         }
 
-    except (RuntimeError, TypeError, ValidationError, ValueError) as e:
+    except (RuntimeError, TypeError, ValidationError, ValueError):
         return {
             "statusCode": HTTPStatus.INTERNAL_SERVER_ERROR,
             "body": "Failed to upload run data to database"
