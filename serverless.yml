@@ -12,14 +12,11 @@ provider:
   stage: ${opt:stage, 'dev'}
   stackName: jstimpson-server-${self:provider.stage}
   environment:
-    STAGE: ${self:provider.stage}
+    ENV: ${self:provider.stage}
     STRAVA_CLIENT_ID: ${ssm:/jstimpson-server/STRAVA_CLIENT_ID}
     STRAVA_CLIENT_SECRET: ${ssm:/jstimpson-server/STRAVA_CLIENT_SECRET}
-    MONGO_PUBLIC_KEY: ${ssm:/jstimpson-server/MONGO_PUBLIC_KEY}
-    MONGO_PRIVATE_KEY: ${ssm:/jstimpson-server/MONGO_PUBLIC_KEY}
-    DB_PROJECT_ID: ${ssm:/jstimpson-server/DB_PROJECT_ID}
-    DB_URI: ${ssm:/jstimpson-server/DB_URI}
     DB_NAME: ${self:custom.db_name.${self:provider.stage}}
+    DB_URI: ${ssm:/jstimpson-server/DB_URI}
   iamRoleStatements:
     - Effect: "Allow"
       Action:
@@ -30,6 +27,7 @@ provider:
 plugins:
   - serverless-offline
   - serverless-python-requirements
+  - serverless-dotenv-plugin
 
 functions:
   db-updater:

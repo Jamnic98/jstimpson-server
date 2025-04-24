@@ -1,6 +1,5 @@
 from datetime import datetime, timedelta
 from typing import List
-
 from pydantic import ValidationError
 
 from app.core.controllers.activity_controllers import fetch_strava_activities_data

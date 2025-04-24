@@ -7,6 +7,7 @@
     "@types/node": "^22.13.14",
     "serverless": "^4.14.1",
     "serverless-deployment-bucket": "^1.6.0",
+    "serverless-dotenv-plugin": "^6.0.0",
     "serverless-offline": "^14.4.0",
     "serverless-python-requirements": "^6.1.2"
   },

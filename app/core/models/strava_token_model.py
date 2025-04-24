@@ -66,7 +66,7 @@ class StravaTokenModel(BaseModel):
                 raise ValueError(f"{new_token_data["message"], new_token_data["errors"]}")
 
             # Log the fetched new token data to inspect its structure
-            logger.info("Fetched new Strava token data: %s", new_token_data)
+            logger.info("Fetched new Strava token data")
 
             # Validate and create StravaTokenModel
             try:
