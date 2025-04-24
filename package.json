@@ -5,7 +5,7 @@
     "deploy:prod": "sls deploy -s prod"
   },
   "devDependencies": {
-    "@types/node": "^22.13.14",
+    "@types/node": "^22.15.0",
     "serverless": "^4.14.1",
     "serverless-deployment-bucket": "^1.6.0",
     "serverless-offline": "^14.4.0",
