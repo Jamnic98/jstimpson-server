@@ -4,9 +4,9 @@ from fastapi import Query, HTTPException
 from fastapi.routing import APIRouter
 from pymongo.errors import PyMongoError
 
-from app.utils.logger import logger
 from app.factories.database import runs_collection
 from app.core.models.run_model import RunCollection
+from app.utils.logger import logger
 
 
 router = APIRouter(prefix="/runs")

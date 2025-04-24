@@ -4,10 +4,10 @@ from requests import post, HTTPError
 from pymongo import ReturnDocument
 from pydantic import BaseModel, BeforeValidator, Field, ValidationError
 
-from app.utils.logger import logger
 from app.factories.database import strava_tokens_collection
 from app.utils.constants import DEFAULT_STRAVA_TOKEN_ID, STRAVA_TOKEN_API_ENDPOINT, REQUEST_TIMEOUT
 from app.utils.config import settings
+from app.utils.logger import logger
 
 
 # Represents an ObjectId field in the database.
