@@ -30,10 +30,10 @@ async def index(after: int = Query(None)):
     try:
         query = {}
         if after:
-            # convert timestamp from unix time
+            # Convert timestamp from unix time
             query = {"start_date_local": {"$gt": datetime.fromtimestamp(after / 1000)}}
 
-        # fetch and return the list of activities
+        # Fetch and return the list of activities
         return ActivityCollection(
             activities=await activities_collection.find(query).to_list(length=None)
         ).model_dump()

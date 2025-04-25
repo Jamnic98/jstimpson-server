@@ -19,7 +19,7 @@ async def fetch_strava_activities_data(after: int = 0) -> List[ActivityModel]:
     """
     logger.info("Fetching activities from Strava API")
     try:
-        # fetch token from db
+        # Fetch token from db
         token_data = await strava_tokens_collection.find_one({"_id": DEFAULT_STRAVA_TOKEN_ID})
         if not token_data:
             raise ValueError(f"No token with id = {DEFAULT_STRAVA_TOKEN_ID}")
@@ -28,7 +28,7 @@ async def fetch_strava_activities_data(after: int = 0) -> List[ActivityModel]:
         if not strava_token.is_token_valid():
             await strava_token.refresh()
 
-        # fetch activities data from strava
+        # Fetch activities data from strava
         strava_activities = get(
             STRAVA_ACTIVITIES_API_ENDPOINT,
             headers={"Authorization": f"Bearer {strava_token.access_token}"},
@@ -50,23 +50,23 @@ async def fetch_strava_activities_data(after: int = 0) -> List[ActivityModel]:
 
 async def add_new_activities_to_db() -> List[ActivityModel]:
     logger.info("Attempting to add new activities to DB")
-    # get a date from a week ago
+    # Get a date from a week ago
     current_date = datetime.now()
     date_in_past = current_date - timedelta(days=14)
-    # create a query to get all activities from DB that are newer than the date in past
+    # Create a query to get all activities from DB that are newer than the date in past
     query = {"start_date_local": {"$gt": date_in_past}}
     try:
-        # fetch recent activities from Strava's API using past date
+        # Fetch recent activities from Strava's API using past date
         strava_activities_data = await fetch_strava_activities_data(int(date_in_past.timestamp()))
         if not strava_activities_data:
             logger.info("No new Strava activities")
             return []
 
-        # fetch recent activities from DB using past date
+        # Fetch recent activities from DB using past date
         db_activity_data = await activities_collection.find(query).to_list(length=None)
         db_activity_data_dates = list(db_activity["start_date_local"] for db_activity in db_activity_data)
 
-        # filter recent Strava activities not already in DB
+        # Filter recent Strava activities not already in DB
         filtered_strava_activities = list(
             # TODO: filter by id instead of start_date_local
             filter(lambda activity: datetime.strptime(
@@ -75,22 +75,31 @@ async def add_new_activities_to_db() -> List[ActivityModel]:
                 strava_activities_data
             )
         )
-        # add new activities to DB
+        # Add new activities to DB
         if filtered_strava_activities:
-            # upload new activities to DB
-            activity_data = []
-            for strava_activity in filtered_strava_activities:
-                # Prepare data for insertion
-                activity_data.append({
-                    "distance": strava_activity["distance"],
-                    "duration": strava_activity["moving_time"],
-                    "start_date_local": strava_activity["start_date_local"],
-                })
+            # Upload new activities to DB
+            activity_data = [{
+                "distance": strava_activity["distance"],
+                "duration": strava_activity["moving_time"],
+                "start_date_local": strava_activity["start_date_local"],
+            } for strava_activity in filtered_strava_activities]
 
-            activities = ActivityCollection.model_validate(activity_data)
-            await activities_collection.insert_many(activities)
-            logger.info("Successfully inserted new activities to DB: %s", activities)
-            return activities.model_dump()
+            # Wrap list in a dict for ActivityCollection validation
+            activities_collection_data = ActivityCollection.model_validate({"activities": activity_data})
+
+            # Convert all activities to dictionaries once
+            activities_dicts = [activity.model_dump() for activity in activities_collection_data.activities]
+
+            # Insert the validated and dumped activities into the database
+            await activities_collection.insert_many(activities_dicts)
+
+            logger.info("Successfully inserted new activities to DB: %s", activities_dicts)
+            return activities_dicts
+
+            # activities = ActivityCollection.model_validate(activity_data)
+            # await activities_collection.insert_many(activities)
+            # logger.info("Successfully inserted new activities to DB: %s", activities)
+            # return activities.model_dump()
 
         logger.info("No new data to upload")
         return []
