@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "offline": "sls offline --stage local --debug",
+    "offline": "sls offline --debug",
     "deploy:dev": "sls deploy -s dev --debug",
     "deploy:prod": "sls deploy -s prod"
   },

@@ -9,10 +9,9 @@ provider:
   name: aws
   region: us-east-1
   runtime: python3.12
-  stage: ${opt:stage, 'local'}
+  stage: ${opt:stage, 'dev'}
   stackName: jstimpson-server-${self:provider.stage}
   environment:
-    ENV: ${self:provider.stage}
     STRAVA_CLIENT_ID: ${ssm:/jstimpson-server/STRAVA_CLIENT_ID}
     STRAVA_CLIENT_SECRET: ${ssm:/jstimpson-server/STRAVA_CLIENT_SECRET}
     DB_NAME: ${ssm:/jstimpson-server/${self:provider.stage}/DB_NAME}
@@ -37,8 +36,7 @@ functions:
     layers:
       - { Ref: PythonRequirementsLambdaLayer }
     events:
-      - schedule:
-          rate: cron(0 0 * * ? *)
+      - schedule: "cron(0 0 * * ? *)"
   api:
     name: jstimpson-server-api-${self:provider.stage}
     handler: app.handlers.api.handler
@@ -58,7 +56,6 @@ functions:
 
 custom:
   dbUri:
-    local: "mongodb://localhost:27017"
     dev: ${ssm:/jstimpson-server/DB_URI}
     prod: ${ssm:/jstimpson-server/DB_URI}
   pythonRequirements:
