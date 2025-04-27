@@ -17,6 +17,7 @@ class ActivityModel(BaseModel):
     moving_time: int
     elapsed_time: int | None
     total_elevation_gain: float | None
+    type: str
     sport_type: SportType | None
     # workout_type: int | None
     strava_id: str | None
@@ -28,9 +29,9 @@ class ActivityModel(BaseModel):
     utc_offset: int | None
     # start_latlng: str | None
     # end_latlng: str | None
-    location_city: str | None
-    location_state: str | None
-    location_country: str | None
+    # location_city: str | None
+    # location_state: str | None
+    # location_country: str | None
     achievement_count: int | None
     # kudos_count: int | None
     # comment_count: int | None
@@ -40,10 +41,10 @@ class ActivityModel(BaseModel):
     # trainer: bool | None
     # commute: bool | None
     # manual: bool | None
-    private: bool | None
-    flagged: bool | None
-    gear_id: str | None
-    from_accepted_tag: bool | None
+    # private: bool | None
+    # flagged: bool | None
+    # gear_id: str | None
+    # from_accepted_tag: bool | None
     average_speed: float | None
     max_speed: float | None
     average_cadence: float | None
