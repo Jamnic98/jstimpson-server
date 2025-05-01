@@ -14,7 +14,11 @@ def create_fastapi_app():
     # noinspection PyTypeChecker
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["http://localhost:3000"],
+        allow_origins=[
+            "http://localhost:3000",
+            "http://localhost",
+            "https://jstimpson.co.uk"
+        ],
         allow_methods=["GET"],
         allow_headers=["*"],
     )
