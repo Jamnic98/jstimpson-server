@@ -1,0 +1,89 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: jstimpson-server SAM stack (FastAPI + DB Updater)
+
+Parameters:
+  StravaClientId:
+    Type: String
+  StravaClientSecret:
+    Type: String
+  DbName:
+    Type: String
+  DbUri:
+    Type: String
+
+Globals:
+  Function:
+    Timeout: 10
+    MemorySize: 1024
+    Runtime: python3.12
+    Environment:
+      Variables:
+        STRAVA_CLIENT_ID: !Ref StravaClientId
+        STRAVA_CLIENT_SECRET: !Ref StravaClientSecret
+        DB_NAME: !Ref DbName
+        DB_URI: !Ref DbUri
+
+Resources:
+  FastApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: app.main.handler
+      FunctionName: jstimpson-server-api
+      Policies:
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: "Allow"
+              Action:
+                - "ssm:GetParameters"
+                - "ssm:GetParameter"
+                - "ssm:GetParametersByPath"
+              Resource:
+                - "arn:aws:ssm:us-east-1:343647980472:parameter/jstimpson-server/*"
+      Events:
+        Proxy:
+          Type: HttpApi
+          Properties:
+            Path: /{proxy+}
+            Method: GET
+            ApiId: !Ref ApiGateway
+
+  ApiGateway:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      CorsConfiguration:
+        AllowOrigins:
+          - '*'
+        AllowMethods:
+          - GET
+
+  DbUpdaterFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: jstimpson-server-db-updater
+      Handler: app.handlers.db_updater.handler
+      MemorySize: 1024
+      Policies:
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: "Allow"
+              Action:
+                - "ssm:GetParameters"
+                - "ssm:GetParameter"
+                - "ssm:GetParametersByPath"
+              Resource:
+                - "arn:aws:ssm:us-east-1:343647980472:parameter/jstimpson-server/*"
+      Events:
+        Schedule:
+          Type: Schedule
+          Properties:
+            Schedule: "cron(0 0 * * ? *)"
+
+Outputs:
+  ApiUrl:
+    Description: "FastAPI API Gateway URL"
+    Value: !Sub 'https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com'
+
+  HandlerFunction:
+    Description: "Mangum Handler Function ARN"
+    Value: !GetAtt FastApiFunction.Arn

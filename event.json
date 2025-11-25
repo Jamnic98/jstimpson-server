@@ -1,9 +1,0 @@
-{
-    "httpMethod": "GET",
-    "path": "/health",
-      "headers": {
-        "Content-Type": "application/json"
-      },
-    "queryStringParameters": {},
-    "body": null
-}
