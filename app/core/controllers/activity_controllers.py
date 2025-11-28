@@ -56,7 +56,7 @@ async def add_new_activities_to_db() -> List[ActivityModel]:
         date_in_past = current_date - timedelta(days=1)
 
         # Fetch recent activities from DB using past date
-        query = {"start_date_local": {"$gt": date_in_past}}
+        query = {"start_date_local": {"$gte": date_in_past}}
         db_activity_data = await activities_collection.find(query).to_list(length=None)
         db_activity_data_dates = list(db_activity["start_date_local"] for db_activity in db_activity_data)
 

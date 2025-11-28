@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: jstimpson-server SAM stack (FastAPI + DB Updater)
+Description: jstimpson-server SAM stack (FastAPI + DB Updaters)
 
 Parameters:
   StravaClientId:
@@ -25,6 +25,10 @@ Globals:
         DB_URI: !Ref DbUri
 
 Resources:
+
+  # ----------------------
+  # FastAPI entrypoint
+  # ----------------------
   FastApiFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -57,12 +61,14 @@ Resources:
         AllowMethods:
           - GET
 
-  DbUpdaterFunction:
+  # ----------------------
+  # Separate Lambda: Runs updater
+  # ----------------------
+  DbRunsUpdaterFunction:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: jstimpson-server-db-updater
-      Handler: app.handlers.db_updater.handler
-      MemorySize: 1024
+      FunctionName: jstimpson-server-db-runs-updater
+      Handler: app.handlers.runs_updater.handler
       Policies:
         - Version: "2012-10-17"
           Statement:
@@ -77,6 +83,32 @@ Resources:
         Schedule:
           Type: Schedule
           Properties:
+            # Update once a day at midnight UTC
+            Schedule: "cron(0 0 * * ? *)"
+
+  # ----------------------
+  # Separate Lambda: Activities updater
+  # ----------------------
+  DbActivitiesUpdaterFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: jstimpson-server-db-activities-updater
+      Handler: app.handlers.activities_updater.handler
+      Policies:
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: "Allow"
+              Action:
+                - "ssm:GetParameters"
+                - "ssm:GetParameter"
+                - "ssm:GetParametersByPath"
+              Resource:
+                - "arn:aws:ssm:us-east-1:343647980472:parameter/jstimpson-server/*"
+      Events:
+        Schedule:
+          Type: Schedule
+          Properties:
+            # Also daily at midnight (or set different time)
             Schedule: "cron(0 0 * * ? *)"
 
 Outputs:
