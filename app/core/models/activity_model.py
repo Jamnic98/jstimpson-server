@@ -11,7 +11,7 @@ PyObjectId = Annotated[str, BeforeValidator(str)]
 
 class ActivityModel(BaseModel):
     id: Optional[PyObjectId] = Field(alias="_id", default=None)
-    strava_id: Optional[str] = Field(None, alias="id")  # official Strava id
+    strava_id: Optional[str] = None
     name: Optional[str]
     distance: Optional[float]  # in meters
     moving_time: Optional[int]  # seconds
@@ -26,11 +26,6 @@ class ActivityModel(BaseModel):
     # Optional performance metrics
     average_speed: Optional[float]  # m/s
     max_speed: Optional[float]  # m/s
-    average_watts: Optional[float]  # watts
-    max_watts: Optional[int]
-    weighted_average_watts: Optional[int]
-    kilojoules: Optional[float]
-    device_watts: Optional[bool]
 
     # Optional physiological data
     average_heartrate: Optional[float]

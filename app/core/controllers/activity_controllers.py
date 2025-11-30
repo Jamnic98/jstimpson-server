@@ -7,6 +7,7 @@ from app.core.models.activity_model import ActivityCollection, ActivityModel
 from app.core.models.strava_token_model import StravaTokenModel
 from app.factories.database import strava_tokens_collection, activities_collection
 from app.utils.constants import DEFAULT_STRAVA_TOKEN_ID, STRAVA_ACTIVITIES_API_ENDPOINT, REQUEST_TIMEOUT
+from app.utils import safe_str
 from app.utils.logger import logger
 
 
@@ -80,7 +81,7 @@ async def add_new_activities_to_db() -> List[ActivityModel]:
         activity_data = []
         for strava_activity in filtered_strava_activities:
             activity_data.append({
-                "strava_id": str(strava_activity["id"]),
+                "strava_id": safe_str(strava_activity.get("id")),
                 "name": strava_activity.get("name"),
                 "distance": strava_activity.get("distance"),
                 "moving_time": strava_activity.get("moving_time"),
@@ -90,14 +91,9 @@ async def add_new_activities_to_db() -> List[ActivityModel]:
                 "start_date": strava_activity.get("start_date"),
                 "start_date_local": strava_activity.get("start_date_local"),
                 "timezone": strava_activity.get("timezone"),
-                "upload_id": str(strava_activity.get("upload_id")) if strava_activity.get("upload_id") else None,
+                "upload_id": safe_str(strava_activity.get("upload_id")),
                 "average_speed": strava_activity.get("average_speed"),
                 "max_speed": strava_activity.get("max_speed"),
-                "average_watts": strava_activity.get("average_watts"),
-                "max_watts": strava_activity.get("max_watts"),
-                "weighted_average_watts": strava_activity.get("weighted_average_watts"),
-                "kilojoules": strava_activity.get("kilojoules"),
-                "device_watts": strava_activity.get("device_watts"),
                 "average_heartrate": strava_activity.get("average_heartrate"),
                 "max_heartrate": strava_activity.get("max_heartrate"),
                 "pr_count": strava_activity.get("pr_count"),
