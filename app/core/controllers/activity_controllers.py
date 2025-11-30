@@ -77,11 +77,32 @@ async def add_new_activities_to_db() -> List[ActivityModel]:
             return []
 
         # Insert new activities into DB
-        activity_data = [{
-            "distance": strava_activity["distance"],
-            "duration": strava_activity["moving_time"],
-            "start_date_local": strava_activity["start_date_local"],
-        } for strava_activity in filtered_strava_activities]
+        activity_data = []
+        for strava_activity in filtered_strava_activities:
+            activity_data.append({
+                "strava_id": str(strava_activity["id"]),
+                "name": strava_activity.get("name"),
+                "distance": strava_activity.get("distance"),
+                "moving_time": strava_activity.get("moving_time"),
+                "elapsed_time": strava_activity.get("elapsed_time"),
+                "total_elevation_gain": strava_activity.get("total_elevation_gain"),
+                "sport_type": strava_activity.get("sport_type"),  # will be converted to SportType
+                "start_date": strava_activity.get("start_date"),
+                "start_date_local": strava_activity.get("start_date_local"),
+                "timezone": strava_activity.get("timezone"),
+                "upload_id": str(strava_activity.get("upload_id")) if strava_activity.get("upload_id") else None,
+                "average_speed": strava_activity.get("average_speed"),
+                "max_speed": strava_activity.get("max_speed"),
+                "average_watts": strava_activity.get("average_watts"),
+                "max_watts": strava_activity.get("max_watts"),
+                "weighted_average_watts": strava_activity.get("weighted_average_watts"),
+                "kilojoules": strava_activity.get("kilojoules"),
+                "device_watts": strava_activity.get("device_watts"),
+                "average_heartrate": strava_activity.get("average_heartrate"),
+                "max_heartrate": strava_activity.get("max_heartrate"),
+                "pr_count": strava_activity.get("pr_count"),
+                "suffer_score": strava_activity.get("suffer_score"),
+            })
 
         # Wrap list in a dict for ActivityCollection validation
         activities_collection_data = ActivityCollection.model_validate({"activities": activity_data})

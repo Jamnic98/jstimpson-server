@@ -10,56 +10,35 @@ PyObjectId = Annotated[str, BeforeValidator(str)]
 
 
 class ActivityModel(BaseModel):
-    id: Optional[PyObjectId] = Field(alias="_id", default=None, exclude=False)
-    # athlete: dict | None
-    name: str | None
-    distance: float
-    moving_time: int
-    elapsed_time: int | None
-    total_elevation_gain: float | None
-    type: str
-    sport_type: SportType | None
-    # workout_type: int | None
-    strava_id: str | None
-    # external_id: str | None
-    upload_id: str | None
-    start_date: datetime | None
-    start_date_local: datetime
-    timezone: str | None
-    utc_offset: int | None
-    # start_latlng: str | None
-    # end_latlng: str | None
-    # location_city: str | None
-    # location_state: str | None
-    # location_country: str | None
-    achievement_count: int | None
-    # kudos_count: int | None
-    # comment_count: int | None
-    # athlete_count: int | None
-    # photo_count: int | None
-    # map: dict | None = Field(...
-    # trainer: bool | None
-    # commute: bool | None
-    # manual: bool | None
-    # private: bool | None
-    # flagged: bool | None
-    # gear_id: str | None
-    # from_accepted_tag: bool | None
-    average_speed: float | None
-    max_speed: float | None
-    average_cadence: float | None
-    average_watts: float | None
-    weighted_average_watts: float | None
-    kilojoules: float | None
-    device_watts: bool | None
-    has_heartrate: bool | None
-    average_heartrate: float | None
-    max_heartrate: float | None
-    max_watts: float | None
-    pr_count: int | None
-    # total_photo_count: int | None
-    # has_kudoed: bool | None
-    suffer_score: int | None
+    id: Optional[PyObjectId] = Field(alias="_id", default=None)
+    strava_id: Optional[str] = Field(None, alias="id")  # official Strava id
+    name: Optional[str]
+    distance: Optional[float]  # in meters
+    moving_time: Optional[int]  # seconds
+    elapsed_time: Optional[int]  # seconds
+    total_elevation_gain: Optional[float]  # meters
+    sport_type: Optional[SportType]
+    start_date: Optional[datetime]
+    start_date_local: Optional[datetime]
+    timezone: Optional[str]
+    upload_id: Optional[str]
+
+    # Optional performance metrics
+    average_speed: Optional[float]  # m/s
+    max_speed: Optional[float]  # m/s
+    average_watts: Optional[float]  # watts
+    max_watts: Optional[int]
+    weighted_average_watts: Optional[int]
+    kilojoules: Optional[float]
+    device_watts: Optional[bool]
+
+    # Optional physiological data
+    average_heartrate: Optional[float]
+    max_heartrate: Optional[float]
+
+    # Optional misc
+    pr_count: Optional[int]
+    suffer_score: Optional[int]
 
 
 class ActivityCollection(BaseModel):
